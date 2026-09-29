@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.database import init_db
+from app.database import init_db, SessionLocal
 from app.routes.api import router as api_router
+from app.seed import seed_all
 import logging
 
 # Logging
@@ -39,6 +40,13 @@ async def startup():
     logger.info("Iniciando aplicação...")
     init_db()
     logger.info("Banco de dados inicializado")
+
+    # Criar usuário padrão e templates
+    db = SessionLocal()
+    try:
+        seed_all(db)
+    finally:
+        db.close()
 
 
 # Root
